@@ -34,14 +34,9 @@
       padding: 60px 20px 80px;
     }
 
-    .container {
-      width: 100%;
-      max-width: 560px;
-    }
+    .container { width: 100%; max-width: 560px; }
 
-    header {
-      margin-bottom: 40px;
-    }
+    header { margin-bottom: 40px; }
 
     .logo {
       display: inline-flex;
@@ -50,12 +45,7 @@
       margin-bottom: 12px;
     }
 
-    .logo-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
+    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 
     .logo-text {
       font-family: var(--mono);
@@ -74,9 +64,7 @@
       letter-spacing: -0.02em;
     }
 
-    h1 strong {
-      font-weight: 500;
-    }
+    h1 strong { font-weight: 500; }
 
     .card {
       background: var(--surface);
@@ -86,7 +74,6 @@
       margin-bottom: 12px;
     }
 
-    /* Drop zone */
     .drop-zone {
       border: 1.5px dashed var(--border-hover);
       border-radius: 8px;
@@ -97,35 +84,14 @@
       background: var(--bg);
     }
 
-    .drop-zone:hover {
+    .drop-zone:hover, .drop-zone.over {
       border-color: var(--accent);
       background: var(--accent-light);
     }
 
-    .drop-zone.over {
-      border-color: var(--accent);
-      background: var(--accent-light);
-    }
-
-    .drop-icon {
-      width: 40px;
-      height: 40px;
-      margin: 0 auto 12px;
-      opacity: 0.35;
-    }
-
-    .drop-title {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .drop-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
+    .drop-icon { width: 40px; height: 40px; margin: 0 auto 12px; opacity: 0.35; }
+    .drop-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .drop-sub { font-size: 12px; color: var(--text-muted); }
     #file-input { display: none; }
 
     .filename-badge {
@@ -143,12 +109,7 @@
 
     .filename-badge.visible { display: flex; }
 
-    .filename-badge svg { flex-shrink: 0; }
-
-    /* Date row */
-    .field-group {
-      margin-top: 20px;
-    }
+    .field-group { margin-top: 20px; }
 
     .field-label {
       font-size: 12px;
@@ -177,13 +138,10 @@
       padding: 9px 12px;
       outline: none;
       transition: border-color 0.15s;
-      appearance: none;
       -webkit-appearance: none;
     }
 
-    .date-row input[type=date]:focus {
-      border-color: var(--accent);
-    }
+    .date-row input[type=date]:focus { border-color: var(--accent); }
 
     .date-sep {
       font-size: 12px;
@@ -192,7 +150,27 @@
       font-family: var(--mono);
     }
 
-    /* Button */
+    select {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8880' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+    }
+
+    select:focus { border-color: var(--accent); }
+
     .btn-run {
       width: 100%;
       margin-top: 24px;
@@ -213,13 +191,13 @@
     .btn-run:active:not(:disabled) { transform: scale(0.99); }
     .btn-run:disabled { opacity: 0.3; cursor: default; }
 
-    /* Result */
     .result-card {
       display: none;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
+      margin-bottom: 12px;
     }
 
     .result-card.visible { display: block; }
@@ -232,17 +210,8 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .result-count {
-      font-family: var(--mono);
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .result-count strong {
-      font-size: 15px;
-      color: var(--accent);
-      font-weight: 500;
-    }
+    .result-count { font-family: var(--mono); font-size: 13px; color: var(--text-muted); }
+    .result-count strong { font-size: 15px; color: var(--accent); font-weight: 500; }
 
     .btn-copy {
       font-family: var(--sans);
@@ -284,6 +253,49 @@
 
     .msg.err { color: var(--danger); }
     .msg:empty { display: none; }
+
+    .historial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .historial-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .historial-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .historial-table { width: 100%; border-collapse: collapse; }
+
+    .historial-table tr { border-bottom: 1px solid var(--border); }
+    .historial-table tr:last-child { border-bottom: none; }
+
+    .historial-table td { padding: 11px 20px; font-size: 13px; }
+    .historial-table td:first-child { color: var(--text); font-weight: 500; width: 50%; }
+    .historial-table td:last-child { font-family: var(--mono); font-size: 12px; color: var(--text-muted); text-align: right; }
+    .historial-table td:last-child.never { color: var(--border-hover); font-style: italic; }
+
+    .loading-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border-hover);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -314,6 +326,19 @@
       </div>
 
       <div class="field-group">
+        <label class="field-label">País</label>
+        <select id="pais">
+          <option value="">— Seleccioná un país —</option>
+          <option value="Argentina">🇦🇷 Argentina</option>
+          <option value="Chile">🇨🇱 Chile</option>
+          <option value="Brasil">🇧🇷 Brasil</option>
+          <option value="Colombia">🇨🇴 Colombia</option>
+          <option value="Perú">🇵🇪 Perú</option>
+          <option value="Uruguay">🇺🇾 Uruguay</option>
+        </select>
+      </div>
+
+      <div class="field-group">
         <label class="field-label">Período</label>
         <div class="date-row">
           <input type="date" id="desde">
@@ -332,9 +357,29 @@
       <textarea id="output" readonly spellcheck="false"></textarea>
       <div class="msg" id="msg"></div>
     </div>
+
+    <div class="historial-card">
+      <div class="historial-header">
+        <span class="historial-title">Último archivo cargado por país</span>
+      </div>
+      <table class="historial-table">
+        <tbody id="historial-body">
+          <tr><td colspan="2"><span class="loading-dot"></span></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
+    const PAISES = [
+      { nombre: 'Argentina', flag: '🇦🇷' },
+      { nombre: 'Chile',     flag: '🇨🇱' },
+      { nombre: 'Brasil',    flag: '🇧🇷' },
+      { nombre: 'Colombia',  flag: '🇨🇴' },
+      { nombre: 'Perú',      flag: '🇵🇪' },
+      { nombre: 'Uruguay',   flag: '🇺🇾' },
+    ];
+
     let csvData = null;
 
     const dropZone = document.getElementById('drop-zone');
@@ -347,6 +392,8 @@
     const countLabel = document.getElementById('count-label');
     const btnCopy = document.getElementById('btn-copy');
     const msgEl = document.getElementById('msg');
+    const paisSelect = document.getElementById('pais');
+    const historialBody = document.getElementById('historial-body');
 
     dropZone.addEventListener('click', () => fileInput.click());
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
@@ -358,13 +405,19 @@
     });
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
 
+    function checkReady() {
+      btnRun.disabled = !(csvData && paisSelect.value);
+    }
+
+    paisSelect.addEventListener('change', checkReady);
+
     function loadFile(file) {
       filenameText.textContent = file.name;
       filenameBadge.classList.add('visible');
       const reader = new FileReader();
       reader.onload = e => {
         csvData = e.target.result;
-        btnRun.disabled = false;
+        checkReady();
         resultCard.classList.remove('visible');
         msgEl.textContent = '';
         msgEl.className = 'msg';
@@ -393,20 +446,61 @@
       return parseInt(m[3] + m[1].padStart(2,'0') + m[2].padStart(2,'0'));
     }
 
-    btnRun.addEventListener('click', () => {
+    function formatFecha(isoDate) {
+      if (!isoDate) return null;
+      const [y, m, d] = isoDate.split('-');
+      return d + '/' + m + '/' + y;
+    }
+
+    function renderHistorial(data) {
+      historialBody.innerHTML = '';
+      for (const p of PAISES) {
+        const fecha = data[p.nombre] || null;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.flag} ${p.nombre}</td>
+          <td class="${fecha ? '' : 'never'}">${fecha ? formatFecha(fecha) : 'sin registros'}</td>
+        `;
+        historialBody.appendChild(tr);
+      }
+    }
+
+    async function fetchHistorial() {
+      try {
+        const res = await fetch('/api/historial');
+        const data = await res.json();
+        renderHistorial(data);
+      } catch {
+        historialBody.innerHTML = '<tr><td colspan="2" style="padding:14px 20px;font-size:12px;color:#c0392b;">No se pudo cargar el historial</td></tr>';
+      }
+    }
+
+    async function saveHistorial(pais, fecha) {
+      try {
+        await fetch('/api/historial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pais, fecha })
+        });
+        fetchHistorial();
+      } catch {}
+    }
+
+    btnRun.addEventListener('click', async () => {
       if (!csvData) return;
       const desde = document.getElementById('desde').value;
+      const pais = paisSelect.value;
+      if (!pais) { msgEl.textContent = 'Seleccioná un país.'; msgEl.className = 'msg err'; return; }
       if (!desde) { msgEl.textContent = 'Elegí una fecha de inicio.'; msgEl.className = 'msg err'; return; }
 
       const [y, mo, d] = desde.split('-');
       const desdeInt = parseInt(y + mo + d);
 
       const hoy = new Date();
-      const hoyInt = parseInt(
-        String(hoy.getFullYear()) +
-        String(hoy.getMonth()+1).padStart(2,'0') +
-        String(hoy.getDate()).padStart(2,'0')
-      );
+      const hoyISO = hoy.getFullYear() + '-' +
+        String(hoy.getMonth()+1).padStart(2,'0') + '-' +
+        String(hoy.getDate()).padStart(2,'0');
+      const hoyInt = parseInt(hoyISO.replace(/-/g,''));
 
       const lines = csvData.split('\n').map(l => l.trim()).filter(Boolean);
       if (lines.length < 2) { msgEl.textContent = 'Archivo vacío.'; msgEl.className = 'msg err'; return; }
@@ -438,6 +532,8 @@
       resultCard.classList.add('visible');
       msgEl.textContent = sinFecha > 0 ? sinFecha + ' filas ignoradas por fecha inválida.' : '';
       msgEl.className = 'msg';
+
+      await saveHistorial(pais, hoyISO);
     });
 
     btnCopy.addEventListener('click', () => {
@@ -447,6 +543,8 @@
         setTimeout(() => btnCopy.textContent = 'Copiar todo', 1800);
       });
     });
+
+    fetchHistorial();
   </script>
 </body>
 </html>
