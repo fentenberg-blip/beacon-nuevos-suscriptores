@@ -1,171 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beacons — Filtro de suscriptores</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
-  .wrap { padding: 1.5rem 0; font-family: var(--font-sans); }
-  .drop-zone { border: 1.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: background 0.15s; }
-  .drop-zone:hover, .drop-zone.over { background: var(--color-background-secondary); }
-  .drop-zone p { margin: 0; color: var(--color-text-secondary); font-size: 14px; }
-  .drop-zone .icon { font-size: 28px; margin-bottom: 8px; display: block; }
-  .drop-zone strong { color: var(--color-text-primary); font-weight: 500; }
-  .date-row { display: flex; align-items: center; gap: 12px; margin: 1.25rem 0; }
-  .date-row label { font-size: 14px; color: var(--color-text-secondary); white-space: nowrap; }
-  .date-row input[type=date] { flex: 1; }
-  button.run { width: 100%; margin-top: 0.5rem; padding: 10px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); transition: background 0.15s; }
-  button.run:hover { background: var(--color-background-secondary); }
-  button.run:disabled { opacity: 0.4; cursor: default; }
-  .result-box { margin-top: 1.5rem; }
-  .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .result-header span { font-size: 13px; color: var(--color-text-secondary); }
-  button.copy { font-size: 13px; padding: 5px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); cursor: pointer; }
-  button.copy:hover { background: var(--color-background-secondary); }
-  textarea { width: 100%; box-sizing: border-box; min-height: 220px; font-family: var(--font-mono); font-size: 13px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; background: var(--color-background-secondary); color: var(--color-text-primary); resize: vertical; }
-  .msg { font-size: 13px; color: var(--color-text-secondary); margin-top: 8px; }
-  .msg.err { color: var(--color-text-danger); }
-  #file-input { display: none; }
-  .filename { font-size: 13px; color: var(--color-text-secondary); margin-top: 10px; text-align: center; }
-</style>
+    :root {
+      --bg: #f5f4f0;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --border-hover: #c8c5ba;
+      --text: #1a1916;
+      --text-muted: #8a8880;
+      --accent: #2d5a3d;
+      --accent-light: #e8f0eb;
+      --danger: #c0392b;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --radius: 10px;
+    }
 
-<div class="wrap">
-  <div class="drop-zone" id="drop-zone">
-    <span class="icon">📄</span>
-    <p><strong>Hacé clic o arrastrá el CSV de Beacons</strong></p>
-    <p style="margin-top:4px;">archivo .csv exportado desde Audience Manager</p>
-    <input type="file" id="file-input" accept=".csv">
-  </div>
-  <div class="filename" id="filename"></div>
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 60px 20px 80px;
+    }
 
-  <div class="date-row">
-    <label>Suscriptos desde</label>
-    <input type="date" id="desde">
-    <label>hasta hoy</label>
-  </div>
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
 
-  <button class="run" id="btn-run" disabled>Filtrar mails</button>
+    header {
+      margin-bottom: 40px;
+    }
 
-  <div class="result-box" id="result-box" style="display:none;">
-    <div class="result-header">
-      <span id="count-label"></span>
-      <button class="copy" id="btn-copy">Copiar todo</button>
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .logo-text {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    h1 strong {
+      font-weight: 500;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 12px;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 1.5px dashed var(--border-hover);
+      border-radius: 8px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg);
+    }
+
+    .drop-zone:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .drop-zone.over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .drop-icon {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 12px;
+      opacity: 0.35;
+    }
+
+    .drop-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .drop-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    #file-input { display: none; }
+
+    .filename-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 8px 12px;
+      background: var(--accent-light);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .filename-badge.visible { display: flex; }
+
+    .filename-badge svg { flex-shrink: 0; }
+
+    /* Date row */
+    .field-group {
+      margin-top: 20px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .date-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .date-row input[type=date] {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .date-row input[type=date]:focus {
+      border-color: var(--accent);
+    }
+
+    .date-sep {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-family: var(--mono);
+    }
+
+    /* Button */
+    .btn-run {
+      width: 100%;
+      margin-top: 24px;
+      padding: 12px;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-run:hover:not(:disabled) { opacity: 0.88; }
+    .btn-run:active:not(:disabled) { transform: scale(0.99); }
+    .btn-run:disabled { opacity: 0.3; cursor: default; }
+
+    /* Result */
+    .result-card {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .result-card.visible { display: block; }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-count {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .result-count strong {
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .btn-copy {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-copy:hover { opacity: 0.75; }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 200px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      background: #fafaf8;
+      border: none;
+      padding: 16px 20px;
+      resize: vertical;
+      outline: none;
+      line-height: 1.7;
+    }
+
+    .msg {
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+    }
+
+    .msg.err { color: var(--danger); }
+    .msg:empty { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-dot"></div>
+        <span class="logo-text">Turismocity · Beacons</span>
+      </div>
+      <h1>Filtro de <strong>nuevos suscriptores</strong></h1>
+    </header>
+
+    <div class="card">
+      <div class="drop-zone" id="drop-zone">
+        <svg class="drop-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="4" width="22" height="30" rx="2" stroke="#1a1916" stroke-width="1.5"/>
+          <path d="M22 4v8h6" stroke="#1a1916" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12 18h14M12 23h10" stroke="#1a1916" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="drop-title">Arrastrá o hacé clic para subir el CSV</div>
+        <div class="drop-sub">Exportado desde Beacons · Audience Manager</div>
+        <input type="file" id="file-input" accept=".csv">
+      </div>
+
+      <div class="filename-badge" id="filename-badge">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="8" height="11" rx="1" stroke="#2d5a3d" stroke-width="1.2"/><path d="M9 1l3 3v7a1 1 0 01-1 1H4" stroke="#2d5a3d" stroke-width="1.2"/></svg>
+        <span id="filename-text"></span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Período</label>
+        <div class="date-row">
+          <input type="date" id="desde">
+          <span class="date-sep">→ hoy</span>
+        </div>
+      </div>
+
+      <button class="btn-run" id="btn-run" disabled>Filtrar mails</button>
     </div>
-    <textarea id="output" readonly></textarea>
-    <div class="msg" id="msg"></div>
+
+    <div class="result-card" id="result-card">
+      <div class="result-header">
+        <span class="result-count" id="count-label">—</span>
+        <button class="btn-copy" id="btn-copy">Copiar todo</button>
+      </div>
+      <textarea id="output" readonly spellcheck="false"></textarea>
+      <div class="msg" id="msg"></div>
+    </div>
   </div>
-</div>
 
-<script>
-  let csvData = null;
+  <script>
+    let csvData = null;
 
-  const dropZone = document.getElementById('drop-zone');
-  const fileInput = document.getElementById('file-input');
-  const filenameEl = document.getElementById('filename');
-  const btnRun = document.getElementById('btn-run');
-  const resultBox = document.getElementById('result-box');
-  const output = document.getElementById('output');
-  const countLabel = document.getElementById('count-label');
-  const btnCopy = document.getElementById('btn-copy');
-  const msgEl = document.getElementById('msg');
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const filenameBadge = document.getElementById('filename-badge');
+    const filenameText = document.getElementById('filename-text');
+    const btnRun = document.getElementById('btn-run');
+    const resultCard = document.getElementById('result-card');
+    const output = document.getElementById('output');
+    const countLabel = document.getElementById('count-label');
+    const btnCopy = document.getElementById('btn-copy');
+    const msgEl = document.getElementById('msg');
 
-  dropZone.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
-  dropZone.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.classList.remove('over');
-    const file = e.dataTransfer.files[0];
-    if (file) loadFile(file);
-  });
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
-
-  function loadFile(file) {
-    filenameEl.textContent = file.name;
-    const reader = new FileReader();
-    reader.onload = e => {
-      csvData = e.target.result;
-      btnRun.disabled = false;
-      resultBox.style.display = 'none';
-      msgEl.textContent = '';
-    };
-    reader.readAsText(file);
-  }
-
-  // Parser CSV robusto — maneja comillas, comas dentro de campos, y caracteres especiales
-  function parseRow(line) {
-    const cols = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (c === '"') { inQ = !inQ; }
-      else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
-      else { cur += c; }
-    }
-    cols.push(cur);
-    return cols;
-  }
-
-  // Convierte MM/DD/YYYY → entero YYYYMMDD para comparación directa
-  function toInt(str) {
-    if (!str) return null;
-    // limpiar caracteres invisibles y espacios
-    str = str.replace(/[^\d\/]/g, '').trim();
-    const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (!m) return null;
-    return parseInt(m[3] + m[1].padStart(2,'0') + m[2].padStart(2,'0'));
-  }
-
-  document.getElementById('btn-run').addEventListener('click', () => {
-    if (!csvData) return;
-    const desde = document.getElementById('desde').value;
-    if (!desde) { msgEl.textContent = 'Elegí una fecha de inicio.'; msgEl.className = 'msg err'; return; }
-
-    const [y, mo, d] = desde.split('-');
-    const desdeInt = parseInt(y + mo + d);
-
-    const hoy = new Date();
-    const hoyInt = parseInt(
-      String(hoy.getFullYear()) +
-      String(hoy.getMonth()+1).padStart(2,'0') +
-      String(hoy.getDate()).padStart(2,'0')
-    );
-
-    const lines = csvData.split('\n').map(l => l.trim()).filter(Boolean);
-    if (lines.length < 2) { msgEl.textContent = 'Archivo vacío.'; msgEl.className = 'msg err'; return; }
-
-    // Detectar índices desde el header
-    const headers = parseRow(lines[0]).map(h => h.replace(/"/g,'').trim().toLowerCase());
-    const emailIdx = headers.findIndex(h => h === 'email');
-    const dateIdx = headers.findIndex(h => h.startsWith('date_added'));
-
-    if (emailIdx === -1 || dateIdx === -1) {
-      msgEl.textContent = 'Columnas encontradas: ' + headers.join(' | ');
-      msgEl.className = 'msg err';
-      resultBox.style.display = 'none';
-      return;
-    }
-
-    const mails = [];
-    let sinFecha = 0;
-
-    for (const row of lines.slice(1)) {
-      const cols = parseRow(row);
-      const email = (cols[emailIdx] || '').trim();
-      if (!email || !email.includes('@')) continue;
-
-      const dateInt = toInt(cols[dateIdx] || '');
-      if (dateInt === null) { sinFecha++; continue; }
-      if (dateInt >= desdeInt && dateInt <= hoyInt) mails.push(email);
-    }
-
-    output.value = mails.join('\n');
-    countLabel.textContent = mails.length + ' mails';
-    resultBox.style.display = 'block';
-    msgEl.textContent = sinFecha > 0 ? sinFecha + ' filas ignoradas por fecha inválida.' : '';
-    msgEl.className = 'msg';
-  });
-
-  btnCopy.addEventListener('click', () => {
-    if (!output.value) return;
-    navigator.clipboard.writeText(output.value).then(() => {
-      btnCopy.textContent = 'Copiado';
-      setTimeout(() => btnCopy.textContent = 'Copiar todo', 1500);
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('over');
+      if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
     });
-  });
-</script>
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+    function loadFile(file) {
+      filenameText.textContent = file.name;
+      filenameBadge.classList.add('visible');
+      const reader = new FileReader();
+      reader.onload = e => {
+        csvData = e.target.result;
+        btnRun.disabled = false;
+        resultCard.classList.remove('visible');
+        msgEl.textContent = '';
+        msgEl.className = 'msg';
+      };
+      reader.readAsText(file);
+    }
+
+    function parseRow(line) {
+      const cols = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+        else { cur += c; }
+      }
+      cols.push(cur);
+      return cols;
+    }
+
+    function toInt(str) {
+      if (!str) return null;
+      str = str.replace(/[^\d\/]/g, '').trim();
+      const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (!m) return null;
+      return parseInt(m[3] + m[1].padStart(2,'0') + m[2].padStart(2,'0'));
+    }
+
+    btnRun.addEventListener('click', () => {
+      if (!csvData) return;
+      const desde = document.getElementById('desde').value;
+      if (!desde) { msgEl.textContent = 'Elegí una fecha de inicio.'; msgEl.className = 'msg err'; return; }
+
+      const [y, mo, d] = desde.split('-');
+      const desdeInt = parseInt(y + mo + d);
+
+      const hoy = new Date();
+      const hoyInt = parseInt(
+        String(hoy.getFullYear()) +
+        String(hoy.getMonth()+1).padStart(2,'0') +
+        String(hoy.getDate()).padStart(2,'0')
+      );
+
+      const lines = csvData.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length < 2) { msgEl.textContent = 'Archivo vacío.'; msgEl.className = 'msg err'; return; }
+
+      const headers = parseRow(lines[0]).map(h => h.replace(/"/g,'').trim().toLowerCase());
+      const emailIdx = headers.findIndex(h => h === 'email');
+      const dateIdx = headers.findIndex(h => h.startsWith('date_added'));
+
+      if (emailIdx === -1 || dateIdx === -1) {
+        msgEl.textContent = 'Columnas: ' + headers.join(' | ');
+        msgEl.className = 'msg err';
+        return;
+      }
+
+      const mails = [];
+      let sinFecha = 0;
+
+      for (const row of lines.slice(1)) {
+        const cols = parseRow(row);
+        const email = (cols[emailIdx] || '').trim();
+        if (!email || !email.includes('@')) continue;
+        const dateInt = toInt(cols[dateIdx] || '');
+        if (dateInt === null) { sinFecha++; continue; }
+        if (dateInt >= desdeInt && dateInt <= hoyInt) mails.push(email);
+      }
+
+      output.value = mails.join('\n');
+      countLabel.innerHTML = '<strong>' + mails.length + '</strong> mails encontrados';
+      resultCard.classList.add('visible');
+      msgEl.textContent = sinFecha > 0 ? sinFecha + ' filas ignoradas por fecha inválida.' : '';
+      msgEl.className = 'msg';
+    });
+
+    btnCopy.addEventListener('click', () => {
+      if (!output.value) return;
+      navigator.clipboard.writeText(output.value).then(() => {
+        btnCopy.textContent = 'Copiado ✓';
+        setTimeout(() => btnCopy.textContent = 'Copiar todo', 1800);
+      });
+    });
+  </script>
+</body>
+</html>
