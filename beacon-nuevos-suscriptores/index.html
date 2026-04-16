@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beacons — Filtro de suscriptores</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f4f0;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --border-hover: #c8c5ba;
+      --text: #1a1916;
+      --text-muted: #8a8880;
+      --accent: #2d5a3d;
+      --accent-light: #e8f0eb;
+      --danger: #c0392b;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 60px 20px 80px;
+    }
+
+    .container { width: 100%; max-width: 560px; }
+
+    header { margin-bottom: 40px; }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+    .logo-text {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    h1 strong { font-weight: 500; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 12px;
+    }
+
+    .drop-zone {
+      border: 1.5px dashed var(--border-hover);
+      border-radius: 8px;
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg);
+    }
+
+    .drop-zone:hover, .drop-zone.over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .drop-icon { width: 40px; height: 40px; margin: 0 auto 12px; opacity: 0.35; }
+    .drop-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .drop-sub { font-size: 12px; color: var(--text-muted); }
+    #file-input { display: none; }
+
+    .filename-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 8px 12px;
+      background: var(--accent-light);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .filename-badge.visible { display: flex; }
+
+    .field-group { margin-top: 20px; }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .date-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .date-row input[type=date] {
+      flex: 1;
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+    }
+
+    .date-row input[type=date]:focus { border-color: var(--accent); }
+
+    .date-sep {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      font-family: var(--mono);
+    }
+
+    select {
+      width: 100%;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8880' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+    }
+
+    select:focus { border-color: var(--accent); }
+
+    .btn-run {
+      width: 100%;
+      margin-top: 24px;
+      padding: 12px;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-run:hover:not(:disabled) { opacity: 0.88; }
+    .btn-run:active:not(:disabled) { transform: scale(0.99); }
+    .btn-run:disabled { opacity: 0.3; cursor: default; }
+
+    .result-card {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .result-card.visible { display: block; }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-count { font-family: var(--mono); font-size: 13px; color: var(--text-muted); }
+    .result-count strong { font-size: 15px; color: var(--accent); font-weight: 500; }
+
+    .btn-copy {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-copy:hover { opacity: 0.75; }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 200px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      background: #fafaf8;
+      border: none;
+      padding: 16px 20px;
+      resize: vertical;
+      outline: none;
+      line-height: 1.7;
+    }
+
+    .msg {
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+    }
+
+    .msg.err { color: var(--danger); }
+    .msg:empty { display: none; }
+
+    .historial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .historial-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .historial-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .historial-table { width: 100%; border-collapse: collapse; }
+
+    .historial-table tr { border-bottom: 1px solid var(--border); }
+    .historial-table tr:last-child { border-bottom: none; }
+
+    .historial-table td { padding: 11px 20px; font-size: 13px; }
+    .historial-table td:first-child { color: var(--text); font-weight: 500; width: 50%; }
+    .historial-table td:last-child { font-family: var(--mono); font-size: 12px; color: var(--text-muted); text-align: right; }
+    .historial-table td:last-child.never { color: var(--border-hover); font-style: italic; }
+
+    .loading-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border-hover);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-dot"></div>
+        <span class="logo-text">Turismocity · Beacons</span>
+      </div>
+      <h1>Filtro de <strong>nuevos suscriptores</strong></h1>
+    </header>
+
+    <div class="card">
+      <div class="drop-zone" id="drop-zone">
+        <svg class="drop-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="4" width="22" height="30" rx="2" stroke="#1a1916" stroke-width="1.5"/>
+          <path d="M22 4v8h6" stroke="#1a1916" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M12 18h14M12 23h10" stroke="#1a1916" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div class="drop-title">Arrastrá o hacé clic para subir el CSV</div>
+        <div class="drop-sub">Exportado desde Beacons · Audience Manager</div>
+        <input type="file" id="file-input" accept=".csv">
+      </div>
+
+      <div class="filename-badge" id="filename-badge">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="8" height="11" rx="1" stroke="#2d5a3d" stroke-width="1.2"/><path d="M9 1l3 3v7a1 1 0 01-1 1H4" stroke="#2d5a3d" stroke-width="1.2"/></svg>
+        <span id="filename-text"></span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">País</label>
+        <select id="pais">
+          <option value="">— Seleccioná un país —</option>
+          <option value="Argentina">🇦🇷 Argentina</option>
+          <option value="Chile">🇨🇱 Chile</option>
+          <option value="Brasil">🇧🇷 Brasil</option>
+          <option value="Colombia">🇨🇴 Colombia</option>
+          <option value="Perú">🇵🇪 Perú</option>
+          <option value="Uruguay">🇺🇾 Uruguay</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Período</label>
+        <div class="date-row">
+          <input type="date" id="desde">
+          <span class="date-sep">→ hoy</span>
+        </div>
+      </div>
+
+      <button class="btn-run" id="btn-run" disabled>Filtrar mails</button>
+    </div>
+
+    <div class="result-card" id="result-card">
+      <div class="result-header">
+        <span class="result-count" id="count-label">—</span>
+        <button class="btn-copy" id="btn-copy">Copiar todo</button>
+      </div>
+      <textarea id="output" readonly spellcheck="false"></textarea>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div class="historial-card">
+      <div class="historial-header">
+        <span class="historial-title">Último archivo cargado por país</span>
+      </div>
+      <table class="historial-table">
+        <tbody id="historial-body">
+          <tr><td colspan="2"><span class="loading-dot"></span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const PAISES = [
+      { nombre: 'Argentina', flag: '🇦🇷' },
+      { nombre: 'Chile',     flag: '🇨🇱' },
+      { nombre: 'Brasil',    flag: '🇧🇷' },
+      { nombre: 'Colombia',  flag: '🇨🇴' },
+      { nombre: 'Perú',      flag: '🇵🇪' },
+      { nombre: 'Uruguay',   flag: '🇺🇾' },
+    ];
+
+    let csvData = null;
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const filenameBadge = document.getElementById('filename-badge');
+    const filenameText = document.getElementById('filename-text');
+    const btnRun = document.getElementById('btn-run');
+    const resultCard = document.getElementById('result-card');
+    const output = document.getElementById('output');
+    const countLabel = document.getElementById('count-label');
+    const btnCopy = document.getElementById('btn-copy');
+    const msgEl = document.getElementById('msg');
+    const paisSelect = document.getElementById('pais');
+    const historialBody = document.getElementById('historial-body');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('over');
+      if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+    function checkReady() {
+      btnRun.disabled = !(csvData && paisSelect.value);
+    }
+
+    paisSelect.addEventListener('change', checkReady);
+
+    function loadFile(file) {
+      filenameText.textContent = file.name;
+      filenameBadge.classList.add('visible');
+      const reader = new FileReader();
+      reader.onload = e => {
+        csvData = e.target.result;
+        checkReady();
+        resultCard.classList.remove('visible');
+        msgEl.textContent = '';
+        msgEl.className = 'msg';
+      };
+      reader.readAsText(file);
+    }
+
+    function parseRow(line) {
+      const cols = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { inQ = !inQ; }
+        else if (c === ',' && !inQ) { cols.push(cur); cur = ''; }
+        else { cur += c; }
+      }
+      cols.push(cur);
+      return cols;
+    }
+
+    function toInt(str) {
+      if (!str) return null;
+      str = str.replace(/[^\d\/]/g, '').trim();
+      const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (!m) return null;
+      return parseInt(m[3] + m[1].padStart(2,'0') + m[2].padStart(2,'0'));
+    }
+
+    function formatFecha(isoDate) {
+      if (!isoDate) return null;
+      const [y, m, d] = isoDate.split('-');
+      return d + '/' + m + '/' + y;
+    }
+
+    function renderHistorial(data) {
+      historialBody.innerHTML = '';
+      for (const p of PAISES) {
+        const fecha = data[p.nombre] || null;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.flag} ${p.nombre}</td>
+          <td class="${fecha ? '' : 'never'}">${fecha ? formatFecha(fecha) : 'sin registros'}</td>
+        `;
+        historialBody.appendChild(tr);
+      }
+    }
+
+    async function fetchHistorial() {
+      try {
+        const res = await fetch('/api/historial');
+        const data = await res.json();
+        renderHistorial(data);
+      } catch {
+        historialBody.innerHTML = '<tr><td colspan="2" style="padding:14px 20px;font-size:12px;color:#c0392b;">No se pudo cargar el historial</td></tr>';
+      }
+    }
+
+    async function saveHistorial(pais, fecha) {
+      try {
+        await fetch('/api/historial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pais, fecha })
+        });
+        fetchHistorial();
+      } catch {}
+    }
+
+    btnRun.addEventListener('click', async () => {
+      if (!csvData) return;
+      const desde = document.getElementById('desde').value;
+      const pais = paisSelect.value;
+      if (!pais) { msgEl.textContent = 'Seleccioná un país.'; msgEl.className = 'msg err'; return; }
+      if (!desde) { msgEl.textContent = 'Elegí una fecha de inicio.'; msgEl.className = 'msg err'; return; }
+
+      const [y, mo, d] = desde.split('-');
+      const desdeInt = parseInt(y + mo + d);
+
+      const hoy = new Date();
+      const hoyISO = hoy.getFullYear() + '-' +
+        String(hoy.getMonth()+1).padStart(2,'0') + '-' +
+        String(hoy.getDate()).padStart(2,'0');
+      const hoyInt = parseInt(hoyISO.replace(/-/g,''));
+
+      const lines = csvData.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length < 2) { msgEl.textContent = 'Archivo vacío.'; msgEl.className = 'msg err'; return; }
+
+      const headers = parseRow(lines[0]).map(h => h.replace(/"/g,'').trim().toLowerCase());
+      const emailIdx = headers.findIndex(h => h === 'email');
+      const dateIdx = headers.findIndex(h => h.startsWith('date_added'));
+
+      if (emailIdx === -1 || dateIdx === -1) {
+        msgEl.textContent = 'Columnas: ' + headers.join(' | ');
+        msgEl.className = 'msg err';
+        return;
+      }
+
+      const mails = [];
+      let sinFecha = 0;
+
+      for (const row of lines.slice(1)) {
+        const cols = parseRow(row);
+        const email = (cols[emailIdx] || '').trim();
+        if (!email || !email.includes('@')) continue;
+        const dateInt = toInt(cols[dateIdx] || '');
+        if (dateInt === null) { sinFecha++; continue; }
+        if (dateInt >= desdeInt && dateInt <= hoyInt) mails.push(email);
+      }
+
+      output.value = mails.join('\n');
+      countLabel.innerHTML = '<strong>' + mails.length + '</strong> mails encontrados';
+      resultCard.classList.add('visible');
+      msgEl.textContent = sinFecha > 0 ? sinFecha + ' filas ignoradas por fecha inválida.' : '';
+      msgEl.className = 'msg';
+
+      await saveHistorial(pais, hoyISO);
+    });
+
+    btnCopy.addEventListener('click', () => {
+      if (!output.value) return;
+      navigator.clipboard.writeText(output.value).then(() => {
+        btnCopy.textContent = 'Copiado ✓';
+        setTimeout(() => btnCopy.textContent = 'Copiar todo', 1800);
+      });
+    });
+
+    fetchHistorial();
+  </script>
+</body>
+</html>
